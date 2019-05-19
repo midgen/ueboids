@@ -1,10 +1,10 @@
 {
-	"FileVersion": 1,
+	"FileVersion": 3,
 	"Version": 1,
 	"VersionName": "1.0",
-	"FriendlyName": UEBOIDS
+	"FriendlyName": "UEBoids",
 	"Description": "",
-	"Category": "Other",
+	"Category": "Boids",
 	"CreatedBy": "Chris Ashworth",
 	"CreatedByURL": "",
 	"DocsURL": "",
@@ -15,7 +15,7 @@
 	"Installed": false,
 	"Modules": [
 		{
-			"Name": UEBOIDS
+			"Name": "UEBoids",
 			"Type": "Developer",
 			"LoadingPhase": "Default"
 		}
