@@ -1,27 +1,27 @@
 // Copyright 1998-2018 Epic Games, Inc. All Rights Reserved.
 
 using UnrealBuildTool;
+using System.IO;
 
 public class UEBOIDS : ModuleRules
 {
 	public UEBOIDS(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-		
-		PublicIncludePaths.AddRange(
-			new string[] {
-                "UEBOIDS/Public"
-				// ... add public include paths required here ...
-			}
-			);
-				
-		
-		PrivateIncludePaths.AddRange(
-			new string[] {
-                "UEBOIDS/Private",
-				// ... add other private include paths required here ...
-			}
-			);
+	
+        PublicIncludePaths.AddRange(
+        new string[] {
+                Path.Combine(ModuleDirectory, "Public")
+            // ... add public include paths required here ...
+        }
+        );
+
+        PrivateIncludePaths.AddRange(
+        new string[] {
+                Path.Combine(ModuleDirectory, "Public")
+			// ... add other private include paths required here ...
+		}
+		);
 			
 		
 		PublicDependencyModuleNames.AddRange(
