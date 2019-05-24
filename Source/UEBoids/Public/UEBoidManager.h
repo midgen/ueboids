@@ -18,7 +18,7 @@ public:
 	ABoidManager();
 	~ABoidManager();
 
-	TArray<UEBoidData> myBoidData;
+	TArray<BoidData> myBoidData;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UEBoids")
 	UStaticMesh* myMesh;
@@ -37,4 +37,6 @@ public:
 
 protected:
 	FBox myBounds;
+
+	FVector myAABBMin, myAABBMax;
 };
