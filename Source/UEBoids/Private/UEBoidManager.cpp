@@ -53,13 +53,15 @@ void ABoidManager::BeginPlay()
 		tx.SetScale3D(FVector(myMeshScale));
 		myMeshComponent->AddInstance(tx);
 	}
+
+	myParameters.Update();
 }
 
 void ABoidManager::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	int index = 0;
+	int i = 0;
 
 	for (BoidData& data : myBoidData)
 	{
@@ -69,31 +71,41 @@ void ABoidManager::Tick(float DeltaSeconds)
 
 		int numInCohesionRange = 0;
 		int numInAlignRange = 0;
+		int j = 0;
 
-		for (int i = 0; i < myBoidData.Num(); i++)
+		for (const BoidData& innerBoid : myBoidData)
 		{
-			if (i != index)
+			if (i != j)
 			{
-				BoidData& innerBoid = myBoidData[i];
 				float dist2 = FVector::DistSquared(data.myPosition, innerBoid.myPosition);
 
-				if (dist2 < myParameters.myCohesionRange * myParameters.myCohesionRange)
+				// Calculate our values for Cohesion, Avoidance, and Alignment
+
+				// For Cohesion, we need the mean position of nearby boids
+				if (dist2 < myParameters.myCohesionRange2)
 				{
 					meanPos += innerBoid.myPosition;
 					numInCohesionRange++;
 				}
-				if (dist2 < (myParameters.myAvoidRange * myParameters.myAvoidRange))
+
+				// For avoidance, we add a vector pointing away from any nearby boids in range
+				if (dist2 < (myParameters.myAvoidRange2))
 				{
 					avoidance +=  data.myPosition - innerBoid.myPosition;
 				}
-				if (dist2 < (myParameters.myAlignRange * myParameters.myAlignRange))
+
+				// For alignment, we need the mean velocity of nearby boids
+				if (dist2 < (myParameters.myAlignRange2))
 				{
 					meanVel += innerBoid.myVelocity;
 				}
 				
 			}
+			++j;
 		}
 
+
+		// Coherence is a vector pointing from current pos towards the mean position of other boids within range
 		if(numInCohesionRange)
 			meanPos /= numInCohesionRange;
 
@@ -104,49 +116,45 @@ void ABoidManager::Tick(float DeltaSeconds)
 
 		FVector alignment = meanVel * myParameters.myAlignWeight;
 
-		// Bounds
+		// Calculate bounds vector, push us back inside the volume if we leave it
 		FVector bounds(0.f);
 
 		if (data.myPosition.X < myAABBMin.X) {
 			bounds.X = myParameters.myAvoidBoundsWeight;
-		}
-		else if (data.myPosition.X > myAABBMax.X) {
+		} else if (data.myPosition.X > myAABBMax.X) {
 			bounds.X = -myParameters.myAvoidBoundsWeight;
 		}
 
 		if (data.myPosition.Y < myAABBMin.Y) {
 			bounds.Y = myParameters.myAvoidBoundsWeight;
-		}
-		else if (data.myPosition.Y > myAABBMax.Y) {
+		} else if (data.myPosition.Y > myAABBMax.Y) {
 			bounds.Y = -myParameters.myAvoidBoundsWeight;
 		}
 
 		if (data.myPosition.Z < myAABBMin.Z) {
 			bounds.Z = myParameters.myAvoidBoundsWeight;
-		}
-		else if (data.myPosition.Z > myAABBMax.Z) {
+		} else if (data.myPosition.Z > myAABBMax.Z) {
 			bounds.Z = -myParameters.myAvoidBoundsWeight;
 		}
 
 		bounds *= myParameters.myAvoidBoundsWeight;
 
 
+		// Add up the component vectors, and Lerp towards to the new velocity to keep things smooth.
 		data.myVelocity = FMath::Lerp(data.myVelocity, (data.myVelocity + (coherence + avoidance + alignment + bounds)).GetClampedToMaxSize(myParameters.myVelocityMax), DeltaSeconds * 10.f);
 		data.myPosition += data.myVelocity * DeltaSeconds;
-		
+
+		// Calculate instance transform. Probably a more efficient way to calculate rotation here?
 		FTransform tx; 
-		myMeshComponent->GetInstanceTransform(index, tx);
-
+		myMeshComponent->GetInstanceTransform(i, tx);
 		FQuat lookAtRotator = FRotationMatrix::MakeFromX(data.myVelocity).ToQuat();
-
-		
-		//tx.SetRotation((UKismetMathLibrary::FindLookAtRotation(data.myPosition, data.myPosition + data.myVelocity).Add(270.0f, 0.0f, 0.0f)).Quaternion());
 		tx.SetRotation(lookAtRotator);
 		tx.SetLocation(data.myPosition);
 
-		myMeshComponent->UpdateInstanceTransform(index, tx, false, index < myBoidData.Num() - 1, true);
+		// Apply the new transform
+		myMeshComponent->UpdateInstanceTransform(i, tx, false, i < myBoidData.Num() - 1, true);
 
-		index++;
+		++i;
 	}
 
 

@@ -27,6 +27,8 @@ struct UEBOIDS_API FUEBoidParameters
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float myVelocityMax;
 
+	float myAvoidRange2, myCohesionRange2, myAlignRange2;
+
 
 	FUEBoidParameters() :
 		myNumBoids(100),
@@ -37,5 +39,15 @@ struct UEBOIDS_API FUEBoidParameters
 		myAlignWeight(1.0f),
 		myAlignRange(1.0f),
 		myAvoidBoundsWeight(1.0f),
-		myVelocityMax(10.f){}
+		myVelocityMax(10.f),
+		myAvoidRange2(0.f),
+		myCohesionRange2(0.f),
+		myAlignRange2(0.f){}
+
+	void Update()
+	{
+		myAvoidRange2 = myAvoidRange * myAvoidRange;
+		myCohesionRange2 = myCohesionRange * myCohesionRange;
+		myAlignRange2 = myAlignRange * myAlignRange;
+	}
 };
