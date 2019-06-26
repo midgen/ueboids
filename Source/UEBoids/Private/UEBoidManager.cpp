@@ -152,7 +152,7 @@ void ABoidManager::Tick(float DeltaSeconds)
 		tx.SetLocation(data.myPosition);
 
 		// Apply the new transform
-		myMeshComponent->UpdateInstanceTransform(i, tx, false, i < myBoidData.Num() - 1, true);
+		myMeshComponent->UpdateInstanceTransform(i, tx, false, i == myBoidData.Num() - 1, true);
 
 		++i;
 	}
