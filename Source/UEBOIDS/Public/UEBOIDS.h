@@ -2,8 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "ModuleManager.h"
+#include <Runtime/Core/Public/Modules/ModuleManager.h>
 
 DECLARE_LOG_CATEGORY_EXTERN(UEBOIDS, Log, All);
 
