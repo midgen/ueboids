@@ -16,7 +16,7 @@
 	"Modules": [
 		{
 			"Name": "UEBOIDS",
-			"Type": "Developer",
+			"Type": "DeveloperTool",
 			"LoadingPhase": "Default"
 		}
 	]
